@@ -43,12 +43,21 @@ void AppClass::ProcessKeyboard(void)
 		m_pCameraMngr->MoveVertical(fSpeed);
 #pragma endregion
 
+#pragma region Extra Credit Sun Movement
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
+		m_m4Sun = glm::translate(m_m4Sun, vector3(bModifier ? -1 : 1, 0, 0));
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Y))
+		m_m4Sun = glm::translate(m_m4Sun, vector3(0, bModifier ? -1 : 1, 0));
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
+		m_m4Sun = glm::translate(m_m4Sun, vector3(0, 0, bModifier ? -1 : 1));
+#pragma endregion
+
 #pragma region Other Actions
 	ON_KEY_PRESS_RELEASE(Escape, NULL, PostMessage(m_pWindow->GetHandler(), WM_QUIT, NULL, NULL));
 	ON_KEY_PRESS_RELEASE(F1, NULL, m_pCameraMngr->SetCameraMode(CAMPERSP));
 	ON_KEY_PRESS_RELEASE(F2, NULL, m_pCameraMngr->SetCameraMode(CAMROTHOZ));
 	ON_KEY_PRESS_RELEASE(F3, NULL, m_pCameraMngr->SetCameraMode(CAMROTHOY));
-	ON_KEY_PRESS_RELEASE(F4, NULL, m_pCameraMngr->SetCameraMode(CAMROTHOX));
+	ON_KEY_PRESS_RELEASE(F4, NULL, m_pCameraMngr->SetCameraMode(CAMROTHOX))
 	static bool bFPSControll = false;
 	ON_KEY_PRESS_RELEASE(F, bFPSControll = !bFPSControll, m_pCameraMngr->SetFPS(bFPSControll));
 #pragma endregion
