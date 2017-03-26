@@ -43,6 +43,14 @@ void AppClass::ProcessKeyboard(void)
 		m_pCameraMngr->MoveVertical(fSpeed);
 #pragma endregion
 
+#pragma region Extra
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Add))
+		m_fDay += 0.05f;
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Subtract))
+		m_fDay -= 0.05f;
+#pragma endregion
+
 #pragma region Other Actions
 	ON_KEY_PRESS_RELEASE(Escape, NULL, PostMessage(m_pWindow->GetHandler(), WM_QUIT, NULL, NULL));
 	ON_KEY_PRESS_RELEASE(F1, NULL, m_pCameraMngr->SetCameraMode(CAMPERSP));
