@@ -13,21 +13,41 @@ void AppClass::InitVariables(void)
 	m_pMesh = new MyMesh();
 	
 	//Creating the Mesh points
-	m_pMesh->AddVertexPosition(vector3(-1.0f, -1.0f, 0.0f));
+	m_pMesh->AddVertexPosition(vector3(-triangleSize, triangleSize, 0.0f));
+	m_pMesh->AddVertexPosition(vector3(0.0f, -triangleSize, 0.0f));
+	m_pMesh->AddVertexPosition(vector3(triangleSize, triangleSize, 0.0f));
+
+	m_pMesh->AddVertexColor(REGREEN);
 	m_pMesh->AddVertexColor(RERED);
-	m_pMesh->AddVertexPosition(vector3( 1.0f, -1.0f, 0.0f));
-	m_pMesh->AddVertexColor(RERED);
-	m_pMesh->AddVertexPosition(vector3(-1.0f,  1.0f, 0.0f));
-	m_pMesh->AddVertexColor(RERED);
-	m_pMesh->AddVertexPosition(vector3(-1.0f,  1.0f, 0.0f));
-	m_pMesh->AddVertexColor(REBLUE);
-	m_pMesh->AddVertexPosition(vector3(1.0f, -1.0f, 0.0f));
-	m_pMesh->AddVertexColor(REBLUE);
-	m_pMesh->AddVertexPosition(vector3( 1.0f, 1.0f, 0.0f));
 	m_pMesh->AddVertexColor(REBLUE);
 
-	//Compiling the mesh
 	m_pMesh->CompileOpenGL3X();
+
+	// Define global vars
+	numRows = 16;
+	triangleSize = 0.5f;
+
+	// Thank you to http://www.geeksforgeeks.org/pascal-triangle/
+	std::vector<matrix4> serpinski;
+	for (int n = 1; n <= numRows; n++) {
+		int C = 1;
+		for (int i = 1; i <= n; i++) {
+			if (C % 2 != 0) {
+				serpinski.push_back(
+					glm::translate(vector3((-0.5f * (n - 1) + (i - 1)) * triangleSize * 2, (-n) * triangleSize * 2, 0.0f)) *
+					glm::rotate(IDENTITY_M4, 180.0f, REAXISZ)
+				);
+			}
+			C = C * (n - i) / i;
+		}
+	}
+	numObjects = serpinski.size();
+
+	m_fMatrixArray = new float[numObjects * 16];
+	for (int x = 0; x < numObjects; x ++) {
+		const float* m4MVP = glm::value_ptr(serpinski[x]);
+		memcpy(&m_fMatrixArray[x * 16], m4MVP, 16 * sizeof(float));
+	}
 }
 
 void AppClass::Update(void)
@@ -65,7 +85,7 @@ void AppClass::Display(void)
 	matrix4 m4Projection = m_pCameraMngr->GetProjectionMatrix();
 	matrix4 m4View = m_pCameraMngr->GetViewMatrix();
 
-	m_pMesh->Render(m4Projection, m4View, IDENTITY_M4);//Rendering nObject(s)											   //clear the screen
+	m_pMesh->RenderList(m4Projection, m4View, m_fMatrixArray, numObjects);//Rendering nObjects
 	
 	m_pMeshMngr->Render(); //renders the render list
 	m_pMeshMngr->ClearRenderList(); //Reset the Render list after render
