@@ -14,7 +14,12 @@ void AppClass::Update(void)
 #pragma endregion
 
 #pragma region YOUR CODE GOES HERE
+	float time = fmod(fTimer, 2.5f);
+	glm::quat rotation = glm::angleAxis(time / 2.5f * 360.0f, REAXISZ); // Angle in degrees of a full circle around Z axis
 	modelMatrix = IDENTITY_M4;
+	modelMatrix *= glm::toMat4(rotation);
+	modelMatrix *= glm::translate(vector3(0.0f, 3.0f, 0.0f));
+	modelMatrix *= glm::toMat4(glm::inverse(rotation));
 #pragma endregion
 
 #pragma region DOES NOT NEED CHANGES
