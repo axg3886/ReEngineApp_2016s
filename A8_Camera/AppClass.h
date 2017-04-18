@@ -7,19 +7,19 @@ Date: 2015/09 (Last Modified on: 15/11)
 
 #include "RE\ReEngAppClass.h"
 #include <SFML\Graphics.hpp>
-#include "MyBoundingSphereClass.h"
-#include "MyBoundingBoxClass.h"
+#include "Camera.h"
 
 using namespace ReEng; //Using ReEng namespace to use all the classes in the dll
 
 class AppClass : public ReEngAppClass
 {
-	vector3 m_v3Position;
-	MyBoundingBoxClass* m_pBS0;
-	MyBoundingBoxClass* m_pBS1;
-	MyBoundingBoxClass* m_pBS2;
+	bool ortho = false;
+	bool arcBallFake = false, shouldRoll = false;
+	Camera* m_Camera = nullptr;
+	PrimitiveClass* m_pCylinder = nullptr;
 public:
 	typedef ReEngAppClass super;
+
 	/*
 	USAGE: Constructor
 	ARGUMENTS: 
@@ -92,10 +92,13 @@ public:
 	OUTPUT: ---
 	*/
 	virtual void Release(void) final;
+
+	void ArcBallFake(void);
 };
 /*
 USAGE:
 ARGUMENTS: ---
 OUTPUT: ---
 */
+
 #endif //__APPLICATION_H_
