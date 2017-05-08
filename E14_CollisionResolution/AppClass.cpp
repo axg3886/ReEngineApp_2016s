@@ -1,7 +1,7 @@
 #include "AppClass.h"
 void AppClass::InitWindow(String a_sWindowName)
 {
-	super::InitWindow("E15 - MyEntityClass"); // Window Name
+	super::InitWindow("E15 - Pong"); // Window Name
 	//m_pSystem->SetWindowResolution(RESOLUTIONS::HD_1280X720);
 	//m_pSystem->SetWindowFullscreen(); //Sets the window to be fullscreen
 	//m_pSystem->SetWindowBorderless(true); //Sets the window to not have borders
@@ -45,6 +45,14 @@ void AppClass::InitVariables(void)
 	m_pBoxT->SetModelMatrix(glm::translate(vector3(0, 5, 0)));
 	m_pBoxB->SetModelMatrix(glm::translate(vector3(0, -5, 0)));
 	m_pBoxR->SetModelMatrix(glm::translate(vector3(10.5, 0, 0)));
+	m_pBoxL->SetModelMatrix(glm::translate(vector3(-10.5, 0, 0)));
+	m_pPalletR->SetModelMatrix(glm::translate(vector3(9.5, 0, 0)));
+	m_pPalletL->SetModelMatrix(glm::translate(vector3(-9.5, 0, 0)));
+
+	scoreL = scoreR = 0;
+
+	useAI = false;
+	strength = 74;
 }
 
 void AppClass::Update(void)
@@ -66,17 +74,39 @@ void AppClass::Update(void)
 	m_pMeshMngr->SetModelMatrix(ToMatrix4(m_qArcBall), "All");
 
 	m_pBall->Update();
-	if (m_pBall->IsColliding(m_pBoxT))
+
+	if (m_pBall->IsColliding(m_pBoxR)) {
+		scoreL++;
+		m_pBall->SetModelMatrix(IDENTITY_M4);
+		m_pBall->SetVelocity(vector3(-0.11f, -0.11f, 0.0f));
+	}
+	if (m_pBall->IsColliding(m_pBoxL)) {
+		scoreR++;
+		m_pBall->SetModelMatrix(IDENTITY_M4);
+		m_pBall->SetVelocity(vector3(0.11f, 0.11f, 0.0f));
+	}
+
+	if (m_pBall->IsColliding(m_pBoxT) || m_pBall->IsColliding(m_pBoxB))
 	{
 		vector3 v3Velocity = m_pBall->GetVelocity();
 		v3Velocity.y *= -1;
 		m_pBall->SetVelocity(v3Velocity);
 	}
-	if (m_pBall->IsColliding(m_pBoxR))
+	if(m_pBall->IsColliding(m_pPalletL) || m_pBall->IsColliding(m_pPalletR))
 	{
 		vector3 v3Velocity = m_pBall->GetVelocity();
 		v3Velocity.x *= -1;
 		m_pBall->SetVelocity(v3Velocity);
+	}
+
+	if (useAI) {
+		matrix4 m4Pallet = m_pPalletR->GetModelMatrix();
+		vector3 palletPos = GetPosition(m4Pallet);
+		vector3 ballPos = GetPosition(m_pBall->GetModelMatrix());
+		float fDelta = ((palletPos.y + 1.0f - ballPos.y) * strength / 1000.0f) - palletPos.y;
+		m_pPalletR->SetModelMatrix(glm::translate(vector3(9.5, fDelta, 0.0f)));
+		if (m_pPalletR->IsColliding(m_pBoxB) || m_pPalletR->IsColliding(m_pBoxT))
+			m_pPalletR->SetModelMatrix(m4Pallet);
 	}
 
 	//Add objects to the render list
@@ -92,12 +122,20 @@ void AppClass::Update(void)
 	int nFPS = m_pSystem->GetFPS();
 	m_pMeshMngr->PrintLine("");
 	m_pMeshMngr->PrintLine(m_pSystem->GetAppName(), REYELLOW);
-
-	m_pMeshMngr->Print("Selection: ");
-	m_pMeshMngr->PrintLine(m_pMeshMngr->GetInstanceGroupName(m_selection.first, m_selection.second), REYELLOW);
 	
 	m_pMeshMngr->Print("FPS:");
-	m_pMeshMngr->Print(std::to_string(nFPS), RERED);
+	m_pMeshMngr->PrintLine(std::to_string(nFPS), RERED);
+
+	m_pMeshMngr->Print("Score: ");
+	m_pMeshMngr->Print(std::to_string(scoreL), scoreL >= scoreR ? REGREEN : RERED);
+	m_pMeshMngr->Print(" | ");
+	m_pMeshMngr->PrintLine(std::to_string(scoreR), scoreR >= scoreL ? REGREEN : RERED);
+
+	m_pMeshMngr->Print("AI (G): ");
+	m_pMeshMngr->PrintLine(useAI ? "true" : "false", useAI ? REGREEN : RERED);
+
+	m_pMeshMngr->Print("Strength: ");
+	m_pMeshMngr->PrintLine(std::to_string(strength), RECYAN);
 }
 
 void AppClass::Display(void)
@@ -122,4 +160,11 @@ void AppClass::Release(void)
 	SafeDelete(m_pPalletR);
 
 	super::Release(); //release the memory of the inherited fields
+}
+
+vector3 AppClass::GetPosition(matrix4 obj) {
+	// Thank you https://www.opengl.org/discussion_boards/showthread.php/178484-Extracting-camera-position-from-a-ModelView-Matrix
+	matrix3 rotMat(obj);
+	vector3 d(obj[3]);
+	return -d * rotMat;
 }

@@ -22,6 +22,11 @@ class AppClass : public ReEngAppClass
 	MyEntityClass* m_pPalletL = nullptr;
 	MyEntityClass* m_pPalletR = nullptr;
 
+	int scoreL, scoreR;
+
+	bool useAI;
+	int strength;
+
 public:
 	typedef ReEngAppClass super;
 
@@ -107,6 +112,8 @@ public:
 	OUTPUT: ---
 	*/
 	virtual void Release(void) final;
+
+	vector3 GetPosition(matrix4 obj);
 };
 /*
 USAGE:

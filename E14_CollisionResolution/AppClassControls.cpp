@@ -7,7 +7,7 @@ void AppClass::ProcessKeyboard(void)
 #pragma region ON_KEY_PRESS_RELEASE
 	static bool	bLastF1 = false, bLastF2 = false, bLastF3 = false, bLastF4 = false, bLastF5 = false,
 				bLastF6 = false, bLastF7 = false, bLastF8 = false, bLastF9 = false, bLastF10 = false,
-				bLastEscape = false, bLastF = false;
+				bLastEscape = false, bLastF = false, bLastG = false;
 #define ON_KEY_PRESS_RELEASE(key, pressed_action, released_action){  \
 			bool pressed = sf::Keyboard::isKeyPressed(sf::Keyboard::key);			\
 			if(pressed){											\
@@ -39,20 +39,25 @@ void AppClass::ProcessKeyboard(void)
 		if (m_pPalletL->IsColliding(m_pBoxB))
 			m_pPalletL->SetModelMatrix(m4Pallet);
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::O))
+	if (!useAI && sf::Keyboard::isKeyPressed(sf::Keyboard::O))
 	{
 		matrix4 m4Pallet = m_pPalletR->GetModelMatrix();
 		m_pPalletR->SetModelMatrix(m4Pallet * glm::translate(vector3(0.0f, fDelta, 0.0f)));
 		if (m_pPalletR->IsColliding(m_pBoxT))
 			m_pPalletR->SetModelMatrix(m4Pallet);
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::L))
+	if (!useAI && sf::Keyboard::isKeyPressed(sf::Keyboard::L))
 	{
 		matrix4 m4Pallet = m_pPalletR->GetModelMatrix();
 		m_pPalletR->SetModelMatrix(m4Pallet * glm::translate(vector3(0.0f, -fDelta, 0.0f)));
 		if (m_pPalletR->IsColliding(m_pBoxB))
 			m_pPalletR->SetModelMatrix(m4Pallet);
 	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::LBracket))
+		strength -= 1;
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::RBracket))
+		strength += 1;
 #pragma endregion
 
 #pragma region Other Actions
@@ -63,6 +68,7 @@ void AppClass::ProcessKeyboard(void)
 	ON_KEY_PRESS_RELEASE(F4, NULL, m_pCameraMngr->SetCameraMode(CAMROTHOX));
 	static bool bFPSControll = false;
 	ON_KEY_PRESS_RELEASE(F, bFPSControll = !bFPSControll, m_pCameraMngr->SetFPS(bFPSControll));
+	ON_KEY_PRESS_RELEASE(G, NULL, useAI = !useAI);
 #pragma endregion
 }
 void AppClass::ProcessMouse(void)
