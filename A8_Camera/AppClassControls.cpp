@@ -43,6 +43,26 @@ void AppClass::ProcessKeyboard(void)
 		m_Camera->MoveVertical(fSpeed);
 #pragma endregion
 
+#pragma region Camera Rotation
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::I))
+		m_Camera->ChangePitch(fSpeed);
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::K))
+		m_Camera->ChangePitch(-fSpeed);
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::J))
+		m_Camera->ChangeRoll(-fSpeed);
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::L))
+		m_Camera->ChangeRoll(fSpeed);
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::U))
+		m_Camera->ChangeYaw(-fSpeed);
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::O))
+		m_Camera->ChangeYaw(fSpeed);
+#pragma endregion
+
 #pragma region Other Actions
 	ON_KEY_PRESS_RELEASE(Escape, NULL, PostMessage(m_pWindow->GetHandler(), WM_QUIT, NULL, NULL));
 	ON_KEY_PRESS_RELEASE(F1, NULL, ortho = false);
